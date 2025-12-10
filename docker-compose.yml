@@ -1,0 +1,65 @@
+version: "3.9"
+
+services:
+  web:
+    build: .
+    container_name: notify_web
+    command: daphne -b 0.0.0.0 -p 8000 config.asgi:application
+    volumes:
+      - .:/app
+      - ./.env.docker:/app/.env 
+    ports:
+      - "8000:8000"
+    depends_on:
+      - mysql
+      - redis
+    environment:
+      MYSQL_DATABASE: notify_db
+      MYSQL_USER: notify_user
+      MYSQL_PASSWORD: notify_password
+      MYSQL_HOST: notify_mysql
+      MYSQL_PORT: 3306
+      CELERY_BROKER_URL: redis://notify_redis:6379/0
+      CELERY_RESULT_BACKEND: redis://notify_redis:6379/0
+      REDIS_URL: redis://redis:6379/0
+
+  celery:
+    build: .
+    container_name: notify_celery
+    command: celery -A config.celery_app worker -l info
+    volumes:
+      - .:/app
+      - ./.env.docker:/app/.env
+    depends_on:
+      - redis
+      - mysql
+    environment:
+      MYSQL_DATABASE: notify_db
+      MYSQL_USER: notify_user
+      MYSQL_PASSWORD: notify_password
+      MYSQL_HOST: notify_mysql
+      MYSQL_PORT: 3306
+      CELERY_BROKER_URL: redis://notify_redis:6379/0
+      CELERY_RESULT_BACKEND: redis://notify_redis:6379/0
+
+  redis:
+    image: redis:7-alpine
+    container_name: notify_redis
+    ports:
+      - "6379:6379"
+
+  mysql:
+    image: mysql:8
+    container_name: notify_mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: notify_db
+      MYSQL_USER: notify_user
+      MYSQL_PASSWORD: notify_password
+    # ports:
+    #   - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+volumes:
+  mysql_data:

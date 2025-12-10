@@ -1,0 +1,51 @@
+wsl --install
+wsl --set-default-version 2
+
+cd /mnt/c/Users/
+
+sudo apt update && sudo apt upgrade -y
+sudo apt install python3 python3-pip python3-venv -y
+sudo apt install git -y
+sudo apt install redis-server -y
+sudo apt install mysql-client -y
+python3 -m venv venv
+source venv/bin/activate
+
+daphne -b 0.0.0.0 -p 8000 config.asgi:application
+
+uvicorn config.asgi:application --host 0.0.0.0 --port 8080
+
+celery -A config.celery_app worker -l info
+
+celery -A config.celery_app beat -l info
+
+docker-compose up --build
+docker-compose run web python manage.py migrate
+docker-compose up
+docker-compose run web python manage.py createsuperuser
+
+docker-compose down --remove-orphans
+docker-compose build --no-cache
+docker-compose build
+docker-compose up -d mysql redis
+docker-compose run --rm web python manage.py migrate
+
+docker-compose run --rm web python -c "from django.conf import settings; print(settings.DATABASES['default'])"
+
+
+docker exec -it notify_mysql mysql -u root -proot_password
+CREATE DATABASE IF NOT EXISTS notify_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE USER IF NOT EXISTS 'notify_user'@'%' IDENTIFIED BY 'notify_password';
+GRANT ALL PRIVILEGES ON notify_db.* TO 'notify_user'@'%';
+FLUSH PRIVILEGES;
+EXIT;
+
+docker-compose ps
+docker-compose logs mysqldocker-compose up -d web celery
+
+docker-compose run --rm web python - << 'PY'
+
+from django.conf import settings
+print("ASGI_APPLICATION =", settings.ASGI_APPLICATION)
+print("CHANNEL_LAYERS =", settings.CHANNEL_LAYERS)
+PY

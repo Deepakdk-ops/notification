@@ -1,0 +1,37 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pdb
+*.egg-info/
+
+# Virtualenv
+venv/
+env/
+
+# Django
+*.log
+db.sqlite3
+media/
+staticfiles/
+
+# Redis/MySQL Docker volumes
+mysql_data/
+*.pid
+
+# Environment
+.env
+.env.*
+
+# Docker
+*.pid
+*.swp
+docker-compose.override.yml
+
+# VS Code
+.vscode/
+.idea/
+
+# Byte-compiled files
+*.pyc
