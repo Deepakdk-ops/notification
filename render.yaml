@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: notification-api
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn notify_service.asgi:application -k uvicorn.workers.UvicornWorker
+    envVars:
+      REDIS_URL: YOUR_UPSTASH_REDIS_URL
+
+  - type: worker
+    name: celery-worker
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: celery -A notify_service worker -l info
+    envVars:
+      REDIS_URL: YOUR_UPSTASH_REDIS_URL

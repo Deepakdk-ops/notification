@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Notification Demo</title>
+    <link href="assets/css/styles.css" rel="stylesheet" />
+</head>
+
+<body class="bg-gray-50">
+    <div class="max-w-3xl mx-auto py-10">
+        <h1 class="text-2xl font-bold">Live Notification Demo</h1>
+
+        <div class="mt-6 p-4 bg-white shadow rounded-lg">
+            <label>User ID</label>
+            <input id="userId" class="border p-2 w-full" placeholder="Enter User ID" />
+
+            <label class="mt-4 block">Message</label>
+            <input id="message" class="border p-2 w-full" placeholder="Notification message" />
+
+            <button onclick="sendNotification()"
+                class="mt-4 px-4 py-2 bg-blue-600 text-white rounded">
+                Send Notification
+            </button>
+        </div>
+
+        <h2 class="text-xl font-semibold mt-8">Real-Time Stream</h2>
+        <div id="wsLog" class="bg-black text-green-400 p-4 h-64 overflow-y-scroll mt-2 text-sm"></div>
+    </div>
+
+    <script src="assets/js/notify-demo.js"></script>
+</body>
+</html>
